@@ -11,7 +11,7 @@ The [`xlsu` folder](./xslu) contains general and common codes for unaligned SLU.
 * optimizers
 
 ## text
-The text folder contains codes for text preprocessing:
+The [`text` folder](./text) contains codes for text preprocessing:
 * dstc2 preprocessing, rearange the json files to visible text files
 * extract features, word2idx, class2idx and so on, then save them for future uses.
 
