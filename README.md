@@ -22,6 +22,7 @@ The [`base` folder](./base) contains two basic different methods for unaligned S
 * hd: (hierarchical decoding model), use different but interconnected modules to predict
     the act-slot-value triples hierarchically. Typically, the predictor for value is a 
     Seq2Seq-Attention model with Pointer network.
+
 And the example codes are based on the dataset provide by DSTC2. These codes can be used as 
 templates when coding for some specific tasks, e.g., word confusion networks application, 
 transformer experiment, and so on. For each new task or setting, we have a copy of the 
@@ -29,8 +30,8 @@ corresponding base method, and modify the code to fit the setting. Therefore, th
 redundancy in the codes, but the benefit is that the codes don't affect each other.
 
 ## dstc2
-The dstc2 repository contains codes of different models for unaligned SLU task in DSTC2:
-* bert: Utilization of the paper [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805),
+The [`dstc2` folder](./dstc2) contains codes of different models for unaligned SLU task in DSTC2:
+* [`bert`](./dstc2/bert): Utilization of the paper [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805),
     with only stc method just for a try.
 * wcn:
 
