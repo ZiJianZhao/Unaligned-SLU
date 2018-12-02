@@ -6,23 +6,20 @@ the labels (act-slot-value triples) are predicted.
 
 ## xslu
 The xlsu repository contains general and common codes for unaligned SLU.
-
-    * utils
-    * modules
-    * optimizers
+* utils
+* modules
+* optimizers
 
 ## text
 The text repository contains codes for text preprocessing:
-
-    * dstc2 preprocessing, rearange the json files to visible text files
-    * extract features, word2idx, class2idx and so on, then save them for future uses.
+* dstc2 preprocessing, rearange the json files to visible text files
+* extract features, word2idx, class2idx and so on, then save them for future uses.
 
 ## base
 The base repository contains two different methods for unaligned SLU:
-
-    * stc: (semantic tuple classifier), treat the whole act-slot-value triple as a label, 
+* stc: (semantic tuple classifier), treat the whole act-slot-value triple as a label, 
     and define the task as a multi-label classification task.
-    * hd: (hierarchical decoding model), use different but interconnected modules to predict
+* hd: (hierarchical decoding model), use different but interconnected modules to predict
     the act-slot-value triples hierarchically. Typically, the predictor for value is a 
     Seq2Seq-Attention model with Pointer network.
 And the example codes are based on the dataset provide by DSTC2. These codes can be used as 
@@ -33,9 +30,8 @@ redundancy in the codes, but the benefit is that the codes don't affect each oth
 
 ## dstc2
 The dstc2 repository contains codes of different models for unaligned SLU task in DSTC2:
-
-    * bert: Utilization of the paper [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805),
+* bert: Utilization of the paper [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805),
     with only stc method just for a try.
-    * wcn:
+* wcn:
 
 
