@@ -5,18 +5,18 @@ Given an utterance (manual, 1best, nbest, word confusion networks),
 the labels (act-slot-value triples) are predicted.
 
 ## xslu
-The xlsu repository contains general and common codes for unaligned SLU.
+The [`xlsu` folder](./xslu) contains general and common codes for unaligned SLU.
 * utils
 * modules
 * optimizers
 
 ## text
-The text repository contains codes for text preprocessing:
+The text folder contains codes for text preprocessing:
 * dstc2 preprocessing, rearange the json files to visible text files
 * extract features, word2idx, class2idx and so on, then save them for future uses.
 
 ## base
-The base repository contains two different methods for unaligned SLU:
+The base folder contains two basic different methods for unaligned SLU:
 * stc: (semantic tuple classifier), treat the whole act-slot-value triple as a label, 
     and define the task as a multi-label classification task.
 * hd: (hierarchical decoding model), use different but interconnected modules to predict
