@@ -363,13 +363,24 @@ class SlotDataset(object):
             if class_string.strip() == '':
                 continue
             classes = class_string.strip().split(';')
-            flag = False
+            classes = [string for string in classes if len(string.strip().split('-')) >= 2]
+            classes = sorted(classes)
+            if len(classes) == 0:
+                continue
+
+            pre_act = classes[0].strip().split('-')[0]
+            tmp = []
             for string in classes:
-                num = len(string.strip().split('-'))
-                if num >= 2:
-                    flag = True
-            if flag:
-                datas.append(line)
+                act = string.strip().split('-')[0]
+                if act == pre_act:
+                    tmp.append(string)
+                else:
+                    class_string = ';'.join(tmp)
+                    datas.append((line[0], class_string))
+                    tmp = [string]
+            if len(tmp) != 0:
+                class_string = ';'.join(tmp)
+                datas.append((line[0], class_string))
         return datas
 
     @staticmethod
@@ -384,7 +395,7 @@ class SlotDataset(object):
                 lis = string.strip().split('-')
                 if len(lis) >= 2:
                     slots.append(lis[1])
-        return slots
+        return list(set(slots))
 
     @staticmethod
     def data_info(utterance, memory, cuda):
@@ -413,24 +424,20 @@ class SlotDataset(object):
         act2idx = memory['act2idx']
         slot2idx = memory['slot2idx']
 
-        lis = [string for string in lis if len(string.strip().split('-')) > 1]
-
-        # slot predictor inputs and labels
-        dic = defaultdict(list)
-        for label in lis:
-            tmp = label.strip().split('-')
-            dic[tmp[0]].append(tmp[1])
         act_ids = []
-        slot_ids = [[] for _ in range(len(dic))]
-        for (i, (key, value)) in enumerate(dic.items()):
-            act_ids.append(act2idx[key])
-            for v in value:
-                slot_ids[i].append(slot2idx[v])
-        act_inputs = torch.tensor(act_ids).view(-1, 1)
-        slot_label = torch.zeros(len(slot_ids), len(slot2idx))
-        for i in range(len(slot_ids)):
-            for j in slot_ids[i]:
-                slot_label[i][j] = 1
+        slot_ids = []
+        for string in lis:
+            str_lis = string.strip().split('-')
+            act = str_lis[0]
+            slot = str_lis[1]
+            act_ids.append(act2idx[act])
+            slot_ids.append(slot2idx[slot])
+        act_ids = list(set(act_ids))
+        slot_ids = list(set(slot_ids))
+        act_inputs = torch.tensor(act_ids).view(1, 1)
+        slot_label = torch.zeros(1, len(slot2idx))
+        for i in slot_ids:
+            slot_label[0][i] = 1
 
         if cuda:
             act_inputs = act_inputs.cuda()

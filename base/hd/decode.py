@@ -135,13 +135,10 @@ def decode_slot(model, utterance, class_string, memory, cuda):
     h_T = hiddens[0].transpose(0, 1).contiguous().view(-1, model.enc_hid_all_dim)
 
     ## slot prediction
-    slots = []
-    for i in range(act_inputs.size(0)):
-        act_input = act_inputs[i, :].view(1,1)
-        slot_scores = model.slot_predict(h_T, act_input)
-        slot_scores = slot_scores.data.cpu().view(-1,).numpy()
-        pred_slots = [i for i,p in enumerate(slot_scores) if p > 0.5]
-        slots.extend([memory['idx2slot'][i] for i in pred_slots])
+    slot_scores = model.slot_predict(h_T, act_inputs)
+    slot_scores = slot_scores.data.cpu().view(-1,).numpy()
+    pred_slots = [i for i,p in enumerate(slot_scores) if p > 0.5]
+    slots = [memory['idx2slot'][i] for i in pred_slots]
 
     return slots
 
