@@ -19,7 +19,7 @@ The [`text` folder](./text) contains codes for text preprocessing:
 The [`base` folder](./base) contains two basic different methods for unaligned SLU:
 * [`stc`](./base/stc): (semantic tuple classifier), treat the whole act-slot-value triple as a label, 
     and define the task as a multi-label classification task.
-* hd: (hierarchical decoding model), use different but interconnected modules to predict
+* [`hd`](./base/hd): (hierarchical decoding model), use different but interconnected modules to predict
     the act-slot-value triples hierarchically. Typically, the predictor for value is a 
     Seq2Seq-Attention model with Pointer network.
 
