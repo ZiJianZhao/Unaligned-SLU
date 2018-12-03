@@ -326,7 +326,7 @@ class ActDataset(object):
             self.reset()
             raise StopIteration
         
-        utterance, class_string = self.datas[self.idx]
+        utterance, class_string = self.datas[self.indices[self.idx]]
         self.idx += 1
 
         data, lengths = self.data_info(utterance, self.memory, self.cuda)
@@ -461,7 +461,7 @@ class SlotDataset(object):
             self.reset()
             raise StopIteration
         
-        utterance, class_string = self.datas[self.idx]
+        utterance, class_string = self.datas[self.indices[self.idx]]
         self.idx += 1
 
         data, lengths = self.data_info(utterance, self.memory, self.cuda)
@@ -591,7 +591,7 @@ class ValueDataset(object):
             self.reset()
             raise StopIteration
         
-        utterance, class_string = self.datas[self.idx]
+        utterance, class_string = self.datas[self.indices[self.idx]]
         self.idx += 1
 
         data, lengths, extra_zeros, enc_batch_extend_vocab_idx, oov_list = \
