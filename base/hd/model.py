@@ -34,9 +34,6 @@ class SLUSystem(nn.Module):
         self.encoder = EncoderRNN('LSTM', self.encoder_bidirectional, 
                 1, hid_dim, self.enc_word_emb, 0.)
 
-        # decoder for auto-encoder training
-        #self.auto_decoder = SeqDecoder(self.word_emb, word_vocab_size, hid_dim, dropout)
-
         # act-slot-value predictors
         self.act_stc = STC(self.enc_hid_all_dim, act_vocab_size, dropout, emb_dim)
         self.slot_stc = STC(self.enc_hid_all_dim + emb_dim, slot_vocab_size, dropout, emb_dim)
@@ -54,15 +51,6 @@ class SLUSystem(nn.Module):
         input_4_slot = torch.cat([act_embs_4_slot, h_T_4_slot], dim=1)
         slot_scores = self.slot_stc(input_4_slot)
         return slot_scores
-
-    def auto_encoder_forward(self, data, lengths, values):
-        """Attention: values here is a cuda tensor"""
-
-        outputs, hiddens = self.encoder(data, lengths)
-        s_decoder = self.enc_to_dec(hiddens)
-        probs = self.auto_decoder(values, s_decoder)
-
-        return probs
 
     def forward(self, data, lengths, acts, act_slot_pairs, values, extra_zeros, enc_batch_extend_vocab_idx):
         """

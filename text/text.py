@@ -190,8 +190,15 @@ class Memory4BaseHD(object):
         memory['idx2act'] = {v:k for k,v in act2idx.items()}
         memory['slot2idx'] = slot2idx
         memory['idx2slot'] = {v:k for k,v in slot2idx.items()}
-        memory['value2idx'] = value2idx
-        memory['idx2value'] = {v:k for k,v in value2idx.items()}
+
+        # -----------------------------------------------------
+        # here, use word2idx instead of value2idx results in a improvement of 0.4 (86.4 -> 86.8) in fscore
+        #memory['value2idx'] = value2idx
+        #memory['idx2value'] = {v:k for k,v in value2idx.items()}
+
+        memory['value2idx'] = word2idx
+        memory['idx2value'] = {v:k for k,v in word2idx.items()}
+        # -----------------------------------------------------
 
         act_emb, slot_emb = self.build_class_embed(act2idx, slot2idx)
         memory['act_emb'] = act_emb
@@ -345,5 +352,5 @@ class Memory4BaseHD(object):
 
 if __name__ == '__main__':
     dstc2_memory =  Memory4BaseHD()
-    dir_name = 'manual/'
+    dir_name = '1best-live/'
     dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.all', dir_name+'memory.pt')

@@ -185,12 +185,12 @@ def train(opt):
     model = make_model(opt)
     if opt.load_word_emb:
         emb = read_emb(opt.memory['enc2idx'])
-        model.enc_word_emb.init_weight_from_pre_emb(emb, opt.fix_emb)
+        model.enc_word_emb.init_weight_from_pre_emb(emb, opt.fix_word_emb)
     if opt.load_class_emb:
         emb = opt.memory['act_emb']
-        model.act_emb.init_weight_from_pre_emb(emb, opt.fix_emb)
+        model.act_emb.init_weight_from_pre_emb(emb, opt.fix_class_emb)
         emb = opt.memory['slot_emb']
-        model.slot_emb.init_weight_from_pre_emb(emb, opt.fix_emb)
+        model.slot_emb.init_weight_from_pre_emb(emb, opt.fix_class_emb)
     if opt.share_param:
         #model.value_decoder.outlin.weight.data = model.word_emb.embedding.weight.data
         #model.value_decoder.outlin.weight.requires_grad = model.word_emb.embedding.weight.requires_grad
