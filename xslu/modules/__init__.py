@@ -2,10 +2,13 @@
 from xslu.modules.embedding import Embedding
 from xslu.modules.encoder import EncoderRNN
 from xslu.modules.attention import Attention
+from xslu.modules.embedding_wcn import SASREmbedding, MWSREmbedding, AWSREmbedding, \
+        CWSREmbedding, SWSREmbedding, SAVGEmbedding, OWSREmbedding, CAVGEmbedding
 
 __all__ = [
         Embedding,
         EncoderRNN,
-        Attention
+        Attention, 
+        SASREmbedding, MWSREmbedding, AWSREmbedding, CWSREmbedding, SWSREmbedding, SAVGEmbedding, OWSREmbedding, CAVGEmbedding
         ]
 
