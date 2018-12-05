@@ -33,6 +33,6 @@ redundancy in the codes, but the benefit is that the codes don't affect each oth
 The [`dstc2` folder](./dstc2) contains codes of different models for unaligned SLU task in DSTC2:
 * [`bert`](./dstc2/bert): Utilization of the paper [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805),
     with only stc method just for a try.
-* wcn:
+* [`wcn`](./dstc2/wcn): Research of word confusion networks to enhance robustness to ASR errors.
 
 
