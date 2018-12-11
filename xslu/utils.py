@@ -63,7 +63,7 @@ def tally_parameters(model, logger=None):
 
 class EarlyStopping(object):
 
-    def __init__(self, mode='min', min_delta=0., patience=5):
+    def __init__(self, mode='min', min_delta=0.1, patience=5):
 
         self.mode = mode
         self.patience = patience
@@ -109,11 +109,11 @@ class EarlyStopping(object):
         # the following change is based on the assumption:
         # more training, even near performance on valid, the latter epoch is better trained
         if mode == 'min':
-            self.is_better = lambda a, best: a < best - min_delta
-            #self.is_better = lambda a, best: a < best + min_delta
+            #self.is_better = lambda a, best: a < best - min_delta
+            self.is_better = lambda a, best: a < best + min_delta
         if mode == 'max':
-            self.is_better = lambda a, best: a > best + min_delta
-            #self.is_better = lambda a, best: a > best - min_delta
+            #self.is_better = lambda a, best: a > best + min_delta
+            self.is_better = lambda a, best: a > best - min_delta
 
 
 def drop_chkpt(chkpt_prefix, epoch, model, optimizer, fscore=None, loss=None):
