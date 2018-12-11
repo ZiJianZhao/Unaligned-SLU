@@ -2,6 +2,7 @@
 import os, datetime
 import logging
 import time, math
+import copy
 
 import torch
 import torch.nn as nn
@@ -10,17 +11,19 @@ import numpy as np
 
 # ********************************* Model Utils *************************************
 
-def read_emb(word2idx, filename='/slfs1/users/zjz17/NLPData/glove.6B/glove.6B.100d.txt'):
+def read_emb(word2idx, emb_dim=100, filename='/slfs1/users/zjz17/NLPData/glove.6B/glove.6B.100d.txt'):
     with open(filename, 'r') as f:
-        emb_dim = 100
         emb = torch.zeros(len(word2idx), emb_dim)
         emb.uniform_(-0.1, 0.1)
         for line in f:
             items = line.strip().split(' ')
+            if len(items) == 2:
+                continue
             word = items[0]
             if word in word2idx:
                 vector = torch.tensor([float(value) for value in items[1:]])
                 emb[word2idx[word]] = vector
+    print('Load pre-trained word vectors from {}'.format(filename))
     return emb
 
 def aeq(*args):
@@ -75,6 +78,9 @@ class EarlyStopping(object):
         self._init_is_better(mode, min_delta)
 
     def __call__(self, epoch, metric, model_state):
+
+        model_state = copy.deepcopy(model_state)
+
         if self.best_metric is None:
             self.best_metric = metric
             self.best_epoch = epoch
