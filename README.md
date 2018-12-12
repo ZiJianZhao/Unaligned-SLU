@@ -35,4 +35,19 @@ The [`dstc2` folder](./dstc2) contains codes of different models for unaligned S
     with only stc method just for a try.
 * [`wcn`](./dstc2/wcn): Research of word confusion networks to enhance robustness to ASR errors.
 
+And the codes in this folder is to research for:
+* Variant models for improving performance and generalization quality
+* Robustness to ASR-errors
 
+## dstc3
+The [`dstc3` folder](./dstc3) contains codes of different models for unaligned SLU task in DSTC3:
+* [`da`](./dstc3/da): Data augmentation.
+
+
+## maps
+The utilization of hierarchical decoding model (hd) in real datas (Chinese maps). The difference of the data from dstc2 is that 
+the length of values is much longer which can be used to test the effectiveness of pointer network in value decoder. Also, we try
+different vocabularies in the decoder input and output ends.
+* ['hd-bas'](./maps/hd-bas): the input and output ends share the same basic vocabulary constructed from the words in utterances in training file.
+* ['hd-spe'](./maps/hd-spe): the input end uses the basic (or pre-trained) vocabulary while the output end uses a special and small vocabulary including
+                            the enumerable values which can not be copied from the input utterance.
