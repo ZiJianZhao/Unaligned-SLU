@@ -188,7 +188,12 @@ class Memory4MapHD(object):
                     if cls not in utt:
                         values.extend(cls.strip().split())
         values = list(set(values))
-        value2idx = {Constants.PAD_WORD: Constants.PAD}
+        value2idx = {
+            Constants.PAD_WORD: Constants.PAD,
+            Constants.UNK_WORD: Constants.UNK,
+            Constants.BOS_WORD: Constants.BOS,
+            Constants.EOS_WORD: Constants.EOS
+        }
         for value in values:
             value2idx[value] = len(value2idx)
         print(value2idx)
