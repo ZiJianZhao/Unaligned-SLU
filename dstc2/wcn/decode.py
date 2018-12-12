@@ -175,8 +175,6 @@ def decode_value(model, cnet, class_string, memory, cuda):
     )[1:-1]
     value_lis = []
     for vid in value_ids:
-        if vid in [0, 1, 2, 3]:
-            continue
         if vid < len(memory['idx2dec']):
             value_lis.append(memory['idx2dec'][vid])
         else:
