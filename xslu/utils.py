@@ -11,7 +11,10 @@ import numpy as np
 
 # ********************************* Model Utils *************************************
 
-def read_emb(word2idx, emb_dim=100, filename='/slfs1/users/zjz17/NLPData/glove.6B/glove.6B.100d.txt'):
+def read_emb(word2idx, emb_dim=100, filename=None): 
+    if filename is None:
+        filename='/slfs1/users/zjz17/NLPData/glove.6B/glove.6B.{}d.txt'.format(emb_dim)
+
     with open(filename, 'r') as f:
         emb = torch.zeros(len(word2idx), emb_dim)
         emb.uniform_(-0.1, 0.1)

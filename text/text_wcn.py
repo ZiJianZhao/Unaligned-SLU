@@ -175,7 +175,8 @@ class Memory4WCNHD(object):
                 if len(lis) >= 2:
                     slots.append(lis[1])
                     if len(lis) == 3:
-                        values.append(lis[2])
+                        words = lis[2].strip().split()
+                        values.extend(words)
 
         acts = sorted(list(set(acts)))
         slots = sorted(list(set(slots)))
@@ -244,5 +245,5 @@ class Memory4WCNHD(object):
 
 if __name__ == '__main__':
     dstc2_memory =  Memory4WCNHD()
-    dir_name = 'wcn-partial/'
-    dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.all', dir_name+'memory.pt')
+    dir_name = 'wcn-base/'
+    dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.train', dir_name+'memory.pt')

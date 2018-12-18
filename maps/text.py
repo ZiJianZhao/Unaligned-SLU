@@ -187,7 +187,10 @@ class Memory4MapHD(object):
                     cls = cls[2]
                     if cls not in utt:
                         values.extend(cls.strip().split())
-        values = list(set(values))
+
+        #tmp = ['导航']
+        #values = sorted(list(set(values) - set(tmp)))
+
         value2idx = {
             Constants.PAD_WORD: Constants.PAD,
             Constants.UNK_WORD: Constants.UNK,
@@ -281,5 +284,5 @@ class Memory4MapHD(object):
 
 if __name__ == '__main__':
     dstc2_memory =  Memory4MapHD()
-    dir_name = 'maps/char-decoder/'
+    dir_name = 'maps/word-decoder/'
     dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.train', dir_name+'memory.pt')

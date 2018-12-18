@@ -16,8 +16,8 @@ sys.path.append(install_path)
 import xslu.Constants as Constants
 from xslu.utils import process_sent, process_word
 
-root_dir = '../dstc2-slu/'
-glove_path = '../../NLPData/glove.6B/glove.6B.100d.txt'
+root_dir = '../../dstc2-slu/'
+glove_path = '../../../NLPData/glove.6B/glove.6B.100d.txt'
 
 def build_class_vocab(filename):
     with codecs.open(filename, 'r') as f:
@@ -192,7 +192,7 @@ class Memory4BaseHD(object):
         memory['idx2slot'] = {v:k for k,v in slot2idx.items()}
 
         # -----------------------------------------------------
-        # here, use word2idx instead of value2idx results in a improvement of 0.4 (86.4 -> 86.8) in fscore
+        # use word2idx performs better than value2idx
         #memory['value2idx'] = value2idx
         #memory['idx2value'] = {v:k for k,v in value2idx.items()}
 
@@ -225,6 +225,16 @@ class Memory4BaseHD(object):
         with codecs.open(filename, 'r') as f:
             lines = f.readlines()
             sents = [line.split('\t<=>\t')[0].strip() for line in lines]
+        
+        """
+        for line in lines:
+            classes = line.split('\t<=>\t')[1].strip().split(';')
+            for cls in classes:
+                lis = cls.strip().split('-')
+                if len(lis) == 3:
+                    sents.append(lis[2].strip())
+        """
+
         for sent in sents:
             ws = process_sent(sent)
             words.extend(ws)
@@ -283,7 +293,8 @@ class Memory4BaseHD(object):
                 if len(lis) >= 2:
                     slots.append(lis[1])
                     if len(lis) == 3:
-                        values.append(lis[2])
+                        words = lis[2].strip().split()
+                        values.extend(words)
 
         acts = sorted(list(set(acts)))
         slots = sorted(list(set(slots)))
@@ -353,4 +364,4 @@ class Memory4BaseHD(object):
 if __name__ == '__main__':
     dstc2_memory =  Memory4BaseHD()
     dir_name = '1best-live/'
-    dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.all', dir_name+'memory.pt')
+    dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.train', dir_name+'m.pt')
