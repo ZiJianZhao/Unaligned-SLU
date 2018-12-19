@@ -38,7 +38,7 @@ def beam_search(model, act_slot, extra_zeros, enc_batch_extend_vocab_idx,
     h, c = init_state  # 1 * 1 * hid_dim
 
     beams = [Beam(tokens = [Constants.BOS], log_probs = [0.0], state = (h, c)) 
-            for _ in range(beam_size)]
+            for _ in range(1)]
 
     results = []
     step = 1
