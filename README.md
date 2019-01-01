@@ -42,6 +42,7 @@ And the codes in this folder is to research for:
 ## dstc3
 The [`dstc3` folder](./dstc3) contains codes of different models for unaligned SLU task in DSTC3:
 * [`da`](./dstc3/da): Data augmentation.
+* [`hd`](./dstc3/hd): hierarchical decoding model on dstc3 data.
 
 
 ## maps
