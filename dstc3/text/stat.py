@@ -49,7 +49,7 @@ def get_lack_acts(train_file, test_file):
     for label in train_labels:
         labels.extend(label.split('-'))
     train_labels = labels
-       
+
     labels = []
     for label in test_labels:
         labels.extend(label.split('-'))
@@ -60,5 +60,5 @@ def get_lack_acts(train_file, test_file):
     print(labels)
 
 if __name__ == '__main__':
-    #get_lack_acts(root_dir+'manual/dstc2_seed_1.train', root_dir+'manual/test')
-    get_lack_acts(root_dir+'manual/test', root_dir+'manual/dstc2_seed_0.train')
+    get_lack_acts(root_dir+'manual/dstc2_seed_1.train', root_dir+'manual/test')
+    #get_lack_acts(root_dir+'manual/test', root_dir+'manual/dstc2_seed_0.train')

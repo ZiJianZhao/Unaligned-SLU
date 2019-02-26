@@ -363,5 +363,5 @@ class Memory4BaseHD(object):
 
 if __name__ == '__main__':
     dstc2_memory =  Memory4BaseHD()
-    dir_name = '1best-live/'
-    dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.train', dir_name+'m.pt')
+    dir_name = 'manual/'
+    dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.train', dir_name+'memory.pt')

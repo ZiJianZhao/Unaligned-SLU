@@ -22,14 +22,14 @@ glove_path = '../../../../NLPData/glove.6B/glove.6B.100d.txt'
 class Memory4BaseHD(object):
 
     """Class used to process DSTC2 texts and save the processed contents.
-    
+
     Args:
         - Need settings:
             * train_file: containing liness <utterance, act-slot-pair triples>.
         - Manually setted in this file
             * root_dir: root dir for the data files and to-save files.
             * ontology_path: DSTC2 ontology path
-            * glove_path: pretrained word embedding file 
+            * glove_path: pretrained word embedding file
     Returns:
         - word2idx: mapping of the unfilterred words in train dataset;
         - word2idx_w_glove: glove enhanced word2idx;
@@ -84,12 +84,12 @@ class Memory4BaseHD(object):
         act_emb, slot_emb = self.build_class_embed(act2idx, slot2idx)
         memory['act_emb'] = act_emb
         memory['slot_emb'] = slot_emb
-        
+
         torch.save(memory, memory_path)
         print('Memory saved in {}'.format(memory_path))
-        
+
     def class_info(self):
-        single_acts = ['ack', 'affirm', 'bye', 'hello', 'negate', 'repeat', 
+        single_acts = ['ack', 'affirm', 'bye', 'hello', 'negate', 'repeat',
             'reqalts', 'reqmore', 'restart', 'thankyou']
         double_acts = ['request']
         triple_acts = ['inform', 'confirm', 'deny']
@@ -106,7 +106,7 @@ class Memory4BaseHD(object):
         with codecs.open(filename, 'r') as f:
             lines = f.readlines()
             sents = [line.split('\t<=>\t')[0].strip() for line in lines]
-        
+
         #"""
         for line in lines:
             classes = line.split('\t<=>\t')[1].strip().split(';')
@@ -136,7 +136,7 @@ class Memory4BaseHD(object):
             Constants.BOS_WORD: Constants.BOS,
             Constants.EOS_WORD: Constants.EOS
         }
-    
+
         # ===========================================
         word2idx['dontcare'] = len(word2idx)
         # ===========================================
@@ -197,7 +197,7 @@ class Memory4BaseHD(object):
         return act2idx, slot2idx, value2idx
 
     def build_class_embed(self, act2idx, slot2idx, emb_file=glove_path):
-        
+
         knowledge = ['pad', 'unk', 'price', 'range', 'address', 'has', 'tv', 'internet',
                 'require', 'more', 'alternatives', 'children', 'allowed']
         words = list(act2idx.keys()) + list(slot2idx.keys()) + knowledge
@@ -232,7 +232,7 @@ class Memory4BaseHD(object):
             print('******************************************')
             print(unknowns)
             print('******************************************')
-        
+
         def class2emb(dic):
             emb = torch.zeros(len(dic), 100)
             emb.uniform_(-0.1, 0.1)
@@ -243,14 +243,14 @@ class Memory4BaseHD(object):
 
         act_emb = class2emb(act2idx)
         slot_emb = class2emb(slot2idx)
-        
+
         return act_emb, slot_emb
 
 if __name__ == '__main__':
     dstc2_memory =  Memory4BaseHD()
     dir_name = 'manual/'
     #dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.all', dir_name+'seed.memory.pt')
-    #dstc2_memory.build_save_memory(dir_name+'dstc2_seed_1.train', 
+    #dstc2_memory.build_save_memory(dir_name+'dstc2_seed_1.train',
     #        dir_name+'dstc2_seed.class.all', dir_name+'dstc2_seed.memory.pt')
-    dstc2_memory.build_save_memory(dir_name+'dstc2_seed_5_rule_1.train', 
-            dir_name+'dstc2_seed.class.all', dir_name+'dstc2_seed_rule.memory.pt')
+    dstc2_memory.build_save_memory(dir_name+'seed_basic_gen.train',
+            dir_name+'dstc2_seed.class.all', dir_name+'seed_basic_gen.memory.pt')

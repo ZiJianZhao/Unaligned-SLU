@@ -49,6 +49,8 @@ def train_opts(parser):
                        help="Path to the memory")
     parser.add_argument('-train_file', required=True,
                        help="train file name")
+    parser.add_argument('-valid_file', required=True,
+                       help="valid file name")
 
     parser.add_argument('-save_model', default='best.pt',
                        help="Saved model filename")
@@ -101,7 +103,7 @@ def parse_args():
             description='Program Options',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    
+
     parser.add_argument('-task', required=True, type=str,
             help="run task: slu, act, slot, value.")
     parser.add_argument('-mode', required=True, type=str,
@@ -150,7 +152,7 @@ def parse_args():
     return opt
 
 def make_model(opt):
-    model = SLUSystem(opt.enc_word_vocab_size, opt.dec_word_vocab_size, 
+    model = SLUSystem(opt.enc_word_vocab_size, opt.dec_word_vocab_size,
             opt.act_vocab_size, opt.slot_vocab_size,
             opt.emb_dim, opt.hid_dim, opt.dropout)
     return model
@@ -174,13 +176,15 @@ class MaskedBCELoss(nn.Module):
         return loss
 
 def train(opt):
-    
+
     opt.experiment = os.path.join(root_dir, opt.experiment)
     if not os.path.exists(opt.experiment):
         os.makedirs(opt.experiment)
 
     opt.save_model = os.path.join(opt.experiment, opt.save_model)
-    if opt.load_model is not None:
+    if opt.load_model is None or opt.load_model == 'none':
+        opt.load_model = None
+    else:
         opt.load_model = os.path.join(opt.experiment, opt.load_model)
     opt.log_path = os.path.join(opt.experiment, 'log.train')
     opt.logger = make_logger(opt.log_path)
@@ -212,10 +216,11 @@ def train(opt):
     if opt.load_model is not None:
         chkpt = torch.load(opt.load_model, map_location = lambda storage, log: storage)
         model.load_state_dict(chkpt)
+        print('Load model from {}'.format(opt.load_model))
     if opt.cuda:
         model = model.cuda()
     print(model)
-    
+
     # optimizer details
     optimizer = Optim(opt.optim, opt.lr, max_grad_norm=opt.max_norm)
     optimizer.set_parameters(model.named_parameters())
@@ -242,8 +247,8 @@ def train(opt):
     elif opt.task == 'value':
         data_iter = ValueDataset(opt.data_root + opt.train_file, opt.memory, opt.cuda, True)
         trainer = ValueTrainer(model, nll_criterion, optimizer, opt.logger, cuda=opt.cuda)
-    
-    trainer.train(opt.epochs, opt.batch_size, opt.memory, data_iter, opt.data_root+'valid', opt.save_model)
+
+    trainer.train(opt.epochs, opt.batch_size, opt.memory, data_iter, opt.data_root+opt.valid_file, opt.save_model)
 
 def test(opt):
 
@@ -275,6 +280,7 @@ def test(opt):
 
             asr_hyps = turn['asr-hyps']
             asr_hyp = asr_hyps[0]['asr-hyp']
+
             classes = decode_slu(model, asr_hyp, opt.memory, opt.cuda)
 
             slu_hyp = [slot2dic(string) for string in classes]
@@ -371,7 +377,7 @@ def stat(opt):
 
     for trainer in trainers:
         metric = trainer.valid_on_epoch(0, opt.test_file, opt.memory)
-    
+
     print('Stat results saved in {}'.format(opt.log_path))
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ from torch import optim
 from xslu.utils import EarlyStopping, Fscore, Statistics
 import xslu.Constants as Constants
 
-from dataloader import DADataset 
+from dataloader import DADataset
 
 class DATrainer(object):
 
@@ -45,22 +45,22 @@ class DATrainer(object):
         return Statistics(loss.item(), non_padding.sum().item(), num_correct)
 
     def train_on_epoch(self, epoch, data_iter, batch_size):
-        
+
         self.logger.info("Epoch {:02} {} begins training, {:05} examples ...................".format(
                 epoch, self.tag, len(data_iter))
             )
 
         self.model.train()
-        
+
         stats = Statistics()
         batch_loss = 0.
 
         for (itr, batch) in enumerate(data_iter):
-            
+
             enc_data, enc_length, extra_zeros, enc_batch_extend_vocab_idx, oov_list, \
                     dec_inp, dec_out = batch
 
-            dist = self.model(enc_data, enc_length, 
+            dist = self.model(enc_data, enc_length,
                     dec_inp, extra_zeros, enc_batch_extend_vocab_idx)
 
             loss = self.criterion(dist, dec_out)
@@ -77,9 +77,9 @@ class DATrainer(object):
                 self.model.zero_grad()
                 batch_loss.backward()
                 self.optimizer.step()
-                
+
                 batch_loss = 0.
- 
+
         # loss logging
         self.logger.info("Epoch {:02} {} ends training, accu: {:6.2f}; ppl: {:6.2f}; elapsed_time: {:6.0f}s".format(
                 epoch, self.tag, stats.accuracy(), stats.ppl(), stats.elapsed_time()
@@ -95,11 +95,11 @@ class DATrainer(object):
         stats = Statistics()
 
         for (itr, batch) in enumerate(data_iter):
-            
+
             enc_data, enc_length, extra_zeros, enc_batch_extend_vocab_idx, oov_list, \
                     dec_inp, dec_out = batch
 
-            dist = self.model(enc_data, enc_length, 
+            dist = self.model(enc_data, enc_length,
                     dec_inp, extra_zeros, enc_batch_extend_vocab_idx)
 
             loss = self.criterion(dist, dec_out)
@@ -123,7 +123,7 @@ class DATrainer(object):
 
             _ = self.train_on_epoch(epoch, train_data, batch_size)
             f = self.valid_on_epoch(epoch, valid_data)
-            
+
             flag = self.early_stop(epoch, f, self.model.state_dict())
             best_epoch = self.early_stop.best_epoch
             best_metric = self.early_stop.best_metric

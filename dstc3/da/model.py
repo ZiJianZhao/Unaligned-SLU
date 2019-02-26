@@ -51,8 +51,8 @@ class DAModel(nn.Module):
         dists = []
         for i in range(dec_data.size(1)):
             y_t = dec_data[:, i].unsqueeze(1)
-            final_dist, s_t = self.decoder(y_t, s_t_1, 
-                ctx, ctx_lengths, 
+            final_dist, s_t = self.decoder(y_t, s_t_1,
+                ctx, ctx_lengths,
                 extra_zeros, enc_batch_extend_vocab_idx
             )
             s_t_1 = s_t
@@ -72,7 +72,7 @@ class Encoder2Decoder(nn.Module):
         self.dec_hid_dim = dec_hid_dim
         self.lin_h = nn.Linear(enc_hid_dim, dec_hid_dim)
         self.lin_c = nn.Linear(enc_hid_dim, dec_hid_dim)
-        
+
         self.init_params()
 
     def init_params(self, initrange=0.1):
@@ -113,7 +113,7 @@ class LSTMDecoder(nn.Module):
         self.class_size = class_size
         self.word_emb = word_emb
 
-        self.rnn = nn.LSTM(emb_dim, hid_dim, 
+        self.rnn = nn.LSTM(emb_dim, hid_dim,
                 num_layers = 1, batch_first = True, bidirectional=False
             )
         self.attn_func = Attention('dot', hid_dim, hid_dim)
@@ -136,7 +136,7 @@ class LSTMDecoder(nn.Module):
                 nn.init.constant_(param, 0)
 
     def forward(self, y_t, s_t_1, ctx, ctx_lengths, extra_zeros, enc_batch_extend_vocab_idx):
-        
+
         # RNN forward
         y_t_emb = self.word_emb(y_t)  # batch * 1 * emb_dim
         lstm_out, s_t = self.rnn(y_t_emb, s_t_1)

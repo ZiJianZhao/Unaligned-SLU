@@ -101,7 +101,7 @@ def parse_args():
             description='Program Options',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    
+
     parser.add_argument('-mode', required=True, type=str,
             help="run mode: train, test, gen")
 
@@ -140,13 +140,13 @@ def parse_args():
     return opt
 
 def make_model(opt):
-    model = DAModel(opt.enc_word_vocab_size, opt.dec_word_vocab_size, 
+    model = DAModel(opt.enc_word_vocab_size, opt.dec_word_vocab_size,
             opt.emb_dim, opt.hid_dim, opt.dropout
             )
     return model
 
 def train(opt):
-    
+
     opt.experiment = os.path.join(root_dir, opt.experiment)
     if not os.path.exists(opt.experiment):
         os.makedirs(opt.experiment)
@@ -183,7 +183,7 @@ def train(opt):
     if opt.cuda:
         model = model.cuda()
     print(model)
-    
+
     # optimizer details
     optimizer = Optim(opt.optim, opt.lr, max_grad_norm=opt.max_norm)
     optimizer.set_parameters(model.named_parameters())

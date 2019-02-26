@@ -38,7 +38,7 @@ def process_word(word):
 # ======================== general ==================================
 
 def slot2dic(string):
-    str_lis = string.split('-')
+    str_lis = string.split('-', 2)
     if len(str_lis) == 1:
         return {'slots': [], 'act': str_lis[0]}
     elif len(str_lis) == 2:
@@ -63,7 +63,7 @@ def get_classes_train():
     return classes
 
 def get_classes_all():
-    classes = ['ack', 'affirm', 'bye', 'hello', 'negate', 'repeat', 
+    classes = ['ack', 'affirm', 'bye', 'hello', 'negate', 'repeat',
             'reqalts', 'reqmore', 'restart', 'thankyou']
     dic = json.loads(open(ontology_path).read())
     for key in dic:
@@ -241,7 +241,7 @@ def get_pairs(data_dir, flist_path, save_path, task):
         else:
             lis = list(zip(sents, classes))
             pairs.extend(lis)
-            
+
     if task.startswith('nbest'):
         data = {'pairs': pairs}
         string = json.dumps(data, sort_keys=True, indent=4, separators=(',', ':'))

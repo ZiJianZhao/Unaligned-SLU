@@ -121,14 +121,14 @@ class DADataset(object):
         if cuda:
             inp_ids = inp_ids.cuda()
             out_ids = out_ids.cuda()
-    
+
         return inp_ids, out_ids
 
     def reset(self):
         self.idx = 0
         if self.epoch_shuffle:
             random.shuffle(self.indices)
-    
+
     def __len__(self):
         return self.data_len
 
@@ -139,13 +139,13 @@ class DADataset(object):
         if self.idx >= self.data_len:
             self.reset()
             raise StopIteration
-        
+
         utterance, class_string = self.datas[self.indices[self.idx]]
         self.idx += 1
 
         enc_data, enc_length, extra_zeros, enc_batch_extend_vocab_idx, oov_list = \
                 self.data_info(class_string, self.memory, self.cuda)
         dec_inp, dec_out = self.label_info(utterance, self.memory, oov_list, self.cuda)
-        
+
         return enc_data, enc_length, extra_zeros, enc_batch_extend_vocab_idx, oov_list, \
                 dec_inp, dec_out

@@ -30,25 +30,25 @@ class Beam(object):
 
 def beam_search(model, act_slot, extra_zeros, enc_batch_extend_vocab_idx,
         init_state, enc_outputs, enc_lengths, vocab_size, cuda,
-        beam_size = 10, max_steps=5):
+        beam_size = 10, max_steps=10):
 
     def sort_beams(beams):
         return sorted(beams, key = lambda b: b.avg_log_prob, reverse=True)
 
     h, c = init_state  # 1 * 1 * hid_dim
 
-    beams = [Beam(tokens = [Constants.BOS], log_probs = [0.0], state = (h, c)) 
+    beams = [Beam(tokens = [Constants.BOS], log_probs = [0.0], state = (h, c))
             for _ in range(beam_size)]
 
     results = []
     step = 1
     while (step < max_steps) and (len(results) < beam_size):
-        
+
         latest_tokens = [b.latest_token for b in beams]
         latest_tokens = [t if t < vocab_size else Constants.UNK for t in latest_tokens]
         y_t = torch.LongTensor(latest_tokens).view(-1, 1)
         if cuda: y_t = y_t.cuda()
-        
+
         hs = [b.state[0] for b in beams]
         cs = [b.state[1] for b in beams]
         s_t_1 = (torch.cat(hs, dim=1), torch.cat(cs, dim=1))
@@ -91,7 +91,7 @@ def beam_search(model, act_slot, extra_zeros, enc_batch_extend_vocab_idx,
                 break
 
         step += 1
-    
+
     if len(results) == 0:
         results = beams
 
@@ -163,11 +163,11 @@ def decode_value(model, utterance, class_string, memory, cuda):
     s_t_1 = s_decoder
     act_slot_ids = act_slot_pairs[0]
     y_t = torch.tensor([Constants.BOS]).view(1, 1)
-    if cuda: 
+    if cuda:
         y_t = y_t.cuda()
-    value_ids = beam_search(model.value_decoder, 
-        act_slot_ids, extra_zeros,enc_batch_extend_vocab_idx, 
-        s_decoder, outputs, lengths, 
+    value_ids = beam_search(model.value_decoder,
+        act_slot_ids, extra_zeros,enc_batch_extend_vocab_idx,
+        s_decoder, outputs, lengths,
         len(memory['dec2idx']), cuda
     )[1:-1]
     value_lis = []
@@ -242,12 +242,12 @@ def decode_slu(model, utterance, memory, cuda):
         s_t_1 = s_decoder
         act_slot_ids = torch.tensor(act_slot[0]).view(1, 2)
         y_t = torch.tensor([Constants.BOS]).view(1, 1)
-        if cuda: 
+        if cuda:
             y_t = y_t.cuda()
             act_slot_ids = act_slot_ids.cuda()
-        value_ids = beam_search(model.value_decoder, 
-            act_slot_ids, extra_zeros,enc_batch_extend_vocab_idx, 
-            s_decoder, outputs, lengths, 
+        value_ids = beam_search(model.value_decoder,
+            act_slot_ids, extra_zeros,enc_batch_extend_vocab_idx,
+            s_decoder, outputs, lengths,
             len(memory['dec2idx']), cuda
         )[1:-1]
         value_lis = []
