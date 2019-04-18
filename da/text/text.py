@@ -19,6 +19,18 @@ from xslu.utils import process_sent, process_word
 root_dir = '../../../dstc3-st/'
 glove_path = '../../../../NLPData/glove.6B/glove.6B.100d.txt'
 
+
+def process_class(class_string):
+    classes = class_string.strip().split(';')
+    results = []
+    for cls in classes:
+        results.append(' '.join(cls.strip().split('-', 2)))
+    string = ' ; '.join(results)
+    #print(class_string, string)
+    #print(string.split())
+    #input()
+    return string
+
 class Memory4BaseHD(object):
 
     """Class used to process DSTC2 texts and save the processed contents.
@@ -57,43 +69,17 @@ class Memory4BaseHD(object):
         memory_path = os.path.join(root_dir, memory_file)
 
         memory = {}
-        word2idx = self.build_word_vocab(train_path)
+        word2idx = self.build_word_vocab(train_path, class_path)
         memory['word2idx'] = word2idx
         memory['word2idx_w_glove'] = self.expand_word_vocab_with_glove(word2idx)
 
-        single_acts, double_acts, triple_acts = self.class_info()
-        memory['single_acts'] = single_acts
-        memory['double_acts'] = double_acts
-        memory['triple_acts'] = triple_acts
-
-        act2idx, slot2idx, value2idx = self.build_class_vocab(class_path)
-        memory['act2idx'] = act2idx
-        memory['idx2act'] = {v:k for k,v in act2idx.items()}
-        memory['slot2idx'] = slot2idx
-        memory['idx2slot'] = {v:k for k,v in slot2idx.items()}
-
-        # -----------------------------------------------------
-        # use word2idx performs better than value2idx
-        #memory['value2idx'] = value2idx
-        #memory['idx2value'] = {v:k for k,v in value2idx.items()}
-
-        memory['value2idx'] = word2idx
-        memory['idx2value'] = {v:k for k,v in word2idx.items()}
         # -----------------------------------------------------
 
-        act_emb, slot_emb = self.build_class_embed(act2idx, slot2idx)
-        memory['act_emb'] = act_emb
-        memory['slot_emb'] = slot_emb
+        memory['word2idx_emb'] = self.build_word_embed(memory['word2idx'])
+        memory['word2idx_w_glove_emb'] = self.build_word_embed(memory['word2idx_w_glove'])
 
         torch.save(memory, memory_path)
         print('Memory saved in {}'.format(memory_path))
-
-    def class_info(self):
-        single_acts = ['ack', 'affirm', 'bye', 'hello', 'negate', 'repeat',
-            'reqalts', 'reqmore', 'restart', 'thankyou']
-        double_acts = ['request']
-        triple_acts = ['inform', 'confirm', 'deny']
-        return single_acts, double_acts, triple_acts
 
     def glove_vocab(self, filename=glove_path):
         with open(filename, 'r') as f:
@@ -101,20 +87,40 @@ class Memory4BaseHD(object):
             words = [line.strip().split(' ')[0] for line in lines]
         return words
 
-    def build_word_vocab(self, filename, frequency=1):
-        words = []
+    def get_class_vocab(self, filename):
         with codecs.open(filename, 'r') as f:
             lines = f.readlines()
-            sents = [line.split('\t<=>\t')[0].strip() for line in lines]
+            lines = [line.strip() for line in lines]
 
-        #"""
+        acts = []
+        slots = []
+        values = []
         for line in lines:
-            classes = line.split('\t<=>\t')[1].strip().split(';')
-            for cls in classes:
-                lis = cls.strip().split('-', 2)
-                if len(lis) == 3:
-                    sents.append(lis[2].strip())
-        #"""
+            lis = line.split('-', 2)
+            if len(lis) >= 1:
+                acts.append(lis[0])
+                if len(lis) >= 2:
+                    slots.append(lis[1])
+                    if len(lis) == 3:
+                        words = lis[2].strip().split()
+                        values.extend(words)
+
+        acts = sorted(list(set(acts)))
+        slots = sorted(list(set(slots)))
+        values = sorted(list(set(values)))
+
+        vocab = sorted(list(set(acts+slots+values)))
+
+        return vocab
+
+    def build_word_vocab(self, filename, class_file, frequency=1):
+        words = []
+        sents = []
+        with codecs.open(filename, 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            sents.append(line.split('\t<=>\t')[0])
+            sents.append(process_class(line.split('\t<=>\t')[1]))
 
         for sent in sents:
             ws = process_sent(sent)
@@ -141,6 +147,12 @@ class Memory4BaseHD(object):
         word2idx['dontcare'] = len(word2idx)
         # ===========================================
 
+        class_vocab = self.get_class_vocab(class_file)
+
+        for word in class_vocab:
+            if word not in word2idx:
+                word2idx[word] = len(word2idx)
+
         for (word, count) in lis:
             if count >= frequency:
                 if word not in word2idx:
@@ -159,48 +171,11 @@ class Memory4BaseHD(object):
         print('==========================================')
         return word2idx_w_glove
 
-    def build_class_vocab(self, filename):
-        with codecs.open(filename, 'r') as f:
-            lines = f.readlines()
-            lines = [line.strip() for line in lines]
-
-        acts = []
-        slots = []
-        values = []
-        for line in lines:
-            lis = line.split('-', 2)
-            if len(lis) >= 1:
-                acts.append(lis[0])
-                if len(lis) >= 2:
-                    slots.append(lis[1])
-                    if len(lis) == 3:
-                        words = lis[2].strip().split()
-                        values.extend(words)
-
-        acts = sorted(list(set(acts)))
-        slots = sorted(list(set(slots)))
-        values = sorted(list(set(values)))
-
-        def lis2dic(lis, tag):
-            class2idx = {Constants.PAD_WORD: Constants.PAD}
-            for line in lis:
-                if line not in class2idx:
-                    class2idx[line] = len(class2idx)
-            print('{} class vocab size: {}'.format(tag, len(class2idx)))
-            return class2idx
-
-        print('==========================================')
-        act2idx = lis2dic(acts, 'act')
-        slot2idx = lis2dic(slots, 'slot')
-        value2idx = lis2dic(values, 'value')
-
-        return act2idx, slot2idx, value2idx
-
-    def build_class_embed(self, act2idx, slot2idx, emb_file=glove_path):
+    def build_word_embed(self, word2idx, emb_file=glove_path):
 
         knowledge = ['pad', 'unk', 'price', 'range', 'address', 'has', 'tv', 'internet',
                 'require', 'more', 'alternatives', 'children', 'allowed']
-        words = list(act2idx.keys()) + list(slot2idx.keys()) + knowledge
+        words = list(word2idx.keys()) + knowledge
         words = list(set(words))
 
         word2emb = {word: np.zeros(100) for word in words}
@@ -233,24 +208,32 @@ class Memory4BaseHD(object):
             print(unknowns)
             print('******************************************')
 
-        def class2emb(dic):
-            emb = torch.zeros(len(dic), 100)
-            emb.uniform_(-0.1, 0.1)
-            for word in dic:
-                if word in word2emb:
-                    emb[dic[word]] = torch.from_numpy(word2emb[word])
-            return emb
+        emb = torch.zeros(len(word2idx), 100)
+        emb.uniform_(-0.1, 0.1)
+        for word in word2idx:
+            if word in word2emb:
+                emb[word2idx[word]] = torch.from_numpy(word2emb[word])
 
-        act_emb = class2emb(act2idx)
-        slot_emb = class2emb(slot2idx)
+        return emb
 
-        return act_emb, slot_emb
+def gen_class_file(class_all_file, class_train_file, class_save_file):
+    with open(class_all_file, 'r') as f:
+        class_all = f.readlines()
+    with open(class_train_file, 'r') as f:
+        class_train = f.readlines()
+    class_save = list(set(class_all)-set(class_train))
+    with open(class_save_file, 'w') as f:
+        for cls in class_save:
+            f.write('{}\n'.format(cls.strip()))
+
 
 if __name__ == '__main__':
     dstc2_memory =  Memory4BaseHD()
     dir_name = 'manual-da/'
-    #dstc2_memory.build_save_memory(dir_name+'train', dir_name+'class.all', dir_name+'seed.memory.pt')
-    #dstc2_memory.build_save_memory(dir_name+'dstc2_seed_1.train',
-    #        dir_name+'dstc2_seed.class.all', dir_name+'dstc2_seed.memory.pt')
-    dstc2_memory.build_save_memory(dir_name+'del/decodes/dstc2train.on.test.1',
-            dir_name+'dstc2.3.all.class', dir_name+'del/decodes/dstc2train.on.test.1.memory.pt')
+    dstc2_memory.build_save_memory(
+        dir_name+'tmp/dstc2.3.all.train',
+        dir_name+'dstc2.3.all.class',
+        dir_name+'tmp/memory.pt'
+    )
+    #dir_name = root_dir + '1best-live-da/'
+    #gen_class_file(dir_name+'class.all', dir_name + 'class.train', dir_name + 'class.gen')

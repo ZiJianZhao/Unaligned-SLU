@@ -1,7 +1,6 @@
 # Special files
 exps
 *.json
-*.sh
 *.csv
 
 # Byte-compiled / optimized / DLL files
