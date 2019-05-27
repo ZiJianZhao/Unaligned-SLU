@@ -11,11 +11,11 @@ import numpy as np
 
 # ********************************* Model Utils *************************************
 
-def read_emb(word2idx, emb_dim=100, filename=None): 
+def read_emb(word2idx, emb_dim=100, filename=None):
     if filename is None:
         filename='/slfs1/users/zjz17/NLPData/glove.6B/glove.6B.{}d.txt'.format(emb_dim)
 
-    with open(filename, 'r') as f:
+    with open(filename, 'r+', encoding='utf-8') as f:
         emb = torch.zeros(len(word2idx), emb_dim)
         emb.uniform_(-0.1, 0.1)
         for line in f:
@@ -71,7 +71,7 @@ class Statistics(object):
     """
     def __init__(self, loss=0., n_words=0., n_correct=0.):
         self.loss = loss
-        self.n_words = n_words 
+        self.n_words = n_words
         self.n_correct = n_correct
         self.start_time = time.time()
 
@@ -152,7 +152,7 @@ def drop_chkpt(chkpt_prefix, epoch, model, optimizer, fscore=None, loss=None):
     """
     i = datetime.datetime.now()
     #chkpt_dir = "Y_{}_M_{}_D_{}_chkpts".format(i.year, i.month, i.day)
-    
+
     real_model = model.module if isinstance(model, nn.DataParallel) else model
 
     chkpt = {
@@ -178,7 +178,7 @@ def load_chkpt(chkpt, model, optimizer=None, use_gpu=True):
     model.load_state_dict(chkpt['model'], strict=False)
 
     if optimizer is not None:
-        
+
         optimizer = chkpt['optimizer']
         saved_optimizer_state_dict = optimizer.optimizer.state_dict()
         optimizer.set_parameters(model.named_parameters())
@@ -190,7 +190,7 @@ def load_chkpt(chkpt, model, optimizer=None, use_gpu=True):
                 for k,v in state.items():
                     if torch.is_tensor(v):
                         state[k] = v.cuda()
-    
+
     if optimizer is not None:
         return epoch, model, optimizer
     else:

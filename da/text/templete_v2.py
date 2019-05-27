@@ -40,7 +40,7 @@ dstc2_templates = {
     'request-food': ['type of food', 'what kind of food do they serve'],
     'request-addr': ['the address', 'whats the address', 'can i get the address'],
     'request-area': ['the area', 'what area'],
-    'request-name': ['what was the name', 'the name'],
+    'request-name': ['what is the name', 'the name'],
     'request-phone': ['what is the phone number', 'the phone number'],
     'request-postcode': ['post code', 'the postcode'],
     'request-pricerange': ['the price range', 'can i get the price range'],
@@ -86,7 +86,7 @@ dstc3_templates = {
 
     'inform-hastv-true': ['has a television', 'with a television', 'television', 'tv'],
     'inform-hastv-false': ['no television', 'no tv'],
-    'inform-childrenallowed-true': ['allows children', 'allows children', 'children allowed'],
+    'inform-childrenallowed-true': ['allows children', 'children allowed'],
     'inform-childrenallowed-false': ['not allow children', 'with no children'],
     'inform-hasinternet-true': ['with internet connection', 'has internet connection', 'with internet', 'has internet'],
     'inform-hasinternet-false': ['no internet connection', 'no internet'],
@@ -109,11 +109,15 @@ dstc3_templates = {
     'confirm-type-restaurant': ['is it a restaurant'],
     'confirm-type-pub': ['pub', 'looking for a pub'],
     'confirm-type-coffeeshop': ['do they serve coffee', 'is it a coffee shop', 'is it a cafe'],
+    'deny-type-restaurant': ['not restaurant'],
+    'deny-type-pub': ['not pub'],
+    'deny-type-coffeeshop': ['not coffeeshop', 'not cafe'],
 
     'inform-pricerange-free': ['free', 'free price range'],
     'confirm-pricerange-free': ['is it free'],
     'deny-pricerange-free': ['not free'],
 
+    'inform-type-dontcare': ['any types'],
     'inform-near-dontcare': ['any where']
     }
 
@@ -132,7 +136,10 @@ def triple_to_utterance(triple, templates):
         new = []
         for ix in results:
             for iy in tmp:
-                new.append(ix + ' ' + iy)
+                if ix.strip() == '':
+                    new.append(iy.strip())
+                else:
+                    new.append(ix.strip() + ' ; ' + iy.strip())
         results = new
     return results
 
@@ -159,15 +166,21 @@ def new_template_file(file_name, save_file, templates):
         for (utt, trp, tmp) in results:
             g.write('{}\t<=>\t{}\t<=>\t{}\n'.format(utt.strip(), trp.strip(), tmp.strip()))
 
-def new_class_template_file(file_name, save_file, templates):
+def new_class_template_file(file_name, save_file, templates, times=1):
     triples = json.loads(open(file_name).read())
     res = []
     for trp in triples:
         class_string = trp[0].strip()
         value_dict = trp[1]
+        samples = []
         tmp = triple_to_utterance(class_string, templates)
-        sample = random.choice(tmp)
-        res.append((class_string, sample.strip(), value_dict))
+        if len(tmp) >= times:
+            samples = random.sample(tmp, times)
+        else:
+            for _ in range(times):
+                samples.append(random.choice(tmp))
+        for sample in samples:
+            res.append((class_string, sample.strip(), value_dict))
         #for t in tmp:
         #    res.append((class_string, t.strip(), value_dict))
     string = json.dumps(res, sort_keys=False, indent=4, separators=(',', ':'))
@@ -184,6 +197,7 @@ def class_to_template_file(file_name, save_file):
         for key in value_dict:
             utt = utt.replace(key, value_dict[key])
             trp = trp.replace(key, value_dict[key])
+        #utt = ''.join(utt.split(';'))
         res.append((utt, trp))
     with open(save_file, 'w') as g:
         for (utt, trp) in res:
@@ -346,21 +360,22 @@ if __name__ == '__main__':
     dstc3_templates = generate_new_templates(dstc2_templates, dstc3_templates)
     """
     new_template_file(
-        dir_name + 'del/dstc3.valid',
-        dir_name + 'tmp/dstc3.valid',
+        dir_name + 'del/dstc3.2000.train',
+        dir_name + 'tmp/dstc3.2000.train',
         dstc3_templates
     )
     #"""
     """
     new_class_template_file(
-        dir_name + 'del/dstc3.test.triples.json',
-        dir_name + 'tmp/dstc3.test.triples.json',
-        dstc3_templates
+        dir_name + 'trp/m1.v2.3',
+        dir_name + 'ttp/m1.v2.3-3',
+        dstc3_templates,
+        3
     )
     #"""
     #"""
     class_to_template_file(
-        dir_name + 'tmp/dstc3.test.triples.json',
-        dir_name + 'tmp/decodes/template.rule.on.test'
+        dir_name + 'ttp/e3',
+        dir_name + 'ttp/e3.rule.no'
     )
     #"""
